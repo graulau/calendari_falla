@@ -41,6 +41,14 @@
             />
           </svg>
         </button>
+        <button class="home-btn" id="header-calendar-btn" type="button" aria-label="Calendario" title="Calendario">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path
+              d="M7 2v2H5a2 2 0 00-2 2v13a3 3 0 003 3h12a3 3 0 003-3V6a2 2 0 00-2-2h-2V2h-2v2H9V2H7zm12 7H5v10a1 1 0 001 1h12a1 1 0 001-1V9z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
         <div class="lang-toggle compact" role="group" aria-label="Idioma">
           <button class="lang-btn" data-lang="es">CAS</button>
           <button class="lang-btn" data-lang="val">VAL</button>
@@ -49,11 +57,25 @@
     </header>
 
     <main class="page">
-      <section class="demo-banner" id="demo-banner" hidden>
-        <p data-i18n="demo.banner">
-          Estas viendo una demo. Las inscripciones no se guardan y los datos son de ejemplo.
-        </p>
+      <section class="section" id="access-gate" hidden>
+        <div class="section-header">
+          <h3 data-i18n="access.title">Acceso</h3>
+        </div>
+        <div class="event-card">
+          <p id="access-gate-message" data-i18n="access.appPrompt">Introduce la clave para entrar.</p>
+          <form id="access-gate-form" class="signup-form">
+            <label>
+              <span data-i18n="access.label">Clave</span>
+              <input type="password" name="secret" required autocomplete="off" />
+            </label>
+            <div class="signup-actions">
+              <button class="primary" type="submit" data-i18n="access.submit">Entrar</button>
+            </div>
+            <p class="form-hint" id="access-gate-hint"></p>
+          </form>
+        </div>
       </section>
+
       <section class="hero">
         <div class="hero-actions only">
           <button class="primary" id="cta-upcoming" data-i18n="hero.cta">Veure pr&ograve;xims actes</button>
@@ -79,6 +101,11 @@
           <h3 data-i18n="upcoming.title">Pr&ograve;xims actes</h3>
         </div>
         <div id="events-route-list" class="card-grid"></div>
+        <div class="events-route-actions">
+          <button id="events-route-load-more" class="ghost" type="button" data-i18n="cards.more">
+            Ver m&aacute;s
+          </button>
+        </div>
         <div id="events-route-sentinel" class="events-sentinel" hidden></div>
       </section>
 
@@ -145,14 +172,15 @@
           <div id="signup-panel">
             <h4 data-i18n="signup.title">Apunta't</h4>
             <form id="signup-form" class="signup-form">
-              <label>
-                <span data-i18n="signup.name">Nom i cognoms</span>
-                <input type="text" name="name" required placeholder="Laura Mart&iacute;" />
-              </label>
-              <label id="extra-field" hidden>
-                <span id="extra-label"></span>
-                <input type="text" name="extra" />
-              </label>
+              <div class="signup-count">
+                <span data-i18n="signup.peopleCount">Personas</span>
+                <div class="signup-count-controls">
+                  <button type="button" class="ghost mini" id="signup-count-dec" aria-label="Menos personas">-</button>
+                  <strong id="signup-count-value">1</strong>
+                  <button type="button" class="ghost mini" id="signup-count-inc" aria-label="Más personas">+</button>
+                </div>
+              </div>
+              <div id="signup-rows" class="signup-rows"></div>
               <div class="model-info" id="model-info"></div>
               <div class="signup-actions">
                 <button class="primary" type="submit" id="signup-submit" data-i18n="signup.submit">Apuntar-me</button>
@@ -166,6 +194,7 @@
             <p data-i18n="signup.successBody">Guarda aquest enlla&ccedil; privat per editar o esborrar la teua inscripci&oacute;.</p>
             <div class="success-actions">
               <button class="primary" id="save-signup-access" data-i18n="signup.saveAccess">Guardar inscripci&oacute;n</button>
+              <button class="ghost" id="save-calendar-event" data-i18n="signup.saveCalendar">Añadir a Google Calendar</button>
               <span class="form-hint" id="save-signup-hint"></span>
             </div>
             <p class="form-hint" data-i18n="signup.tokenHint">
@@ -194,12 +223,13 @@
             <h4 data-i18n="token.editTitle">Editar inscripci&oacute;</h4>
             <form id="edit-form" class="signup-form">
               <label>
-                <span data-i18n="signup.name">Nom i cognoms</span>
-                <input type="text" name="name" required />
+                <span data-i18n="signup.names">Nombres y apellidos</span>
+                <textarea name="names" rows="3" required></textarea>
               </label>
               <label id="edit-extra-field" hidden>
                 <span id="edit-extra-label"></span>
-                <input type="text" name="extra" />
+                <input type="text" name="extra_text" />
+                <select name="extra_select" hidden></select>
               </label>
               <div class="signup-actions">
                 <button class="primary" type="submit" data-i18n="token.save">Guardar canvis</button>
@@ -245,14 +275,12 @@
             <h4>Eventos</h4>
             <button class="ghost" id="admin-new">Nuevo evento</button>
           </div>
-          <div class="admin-close">
-            <label>
-              <span>Cerrar evento activo</span>
-              <select id="admin-close-select"></select>
-            </label>
-            <button class="danger" id="admin-close-btn" type="button">Cerrar evento</button>
+          <div class="admin-tabs">
+            <button class="ghost active" id="admin-tab-active" type="button">Activos (0)</button>
+            <button class="ghost" id="admin-tab-closed" type="button">Cerrados (0)</button>
           </div>
           <div id="admin-events" class="admin-events"></div>
+          <p class="form-hint" id="admin-events-empty" hidden>No hay eventos en esta pestaña.</p>
         </div>
         <div class="event-card" id="admin-editor" hidden>
           <h4 id="admin-editor-title">Editar evento</h4>
@@ -300,9 +328,21 @@
               <span>Etiqueta extra (castellano)</span>
               <input type="text" name="extra_label" />
             </label>
+            <label>
+              <span>Opciones (castellano, separadas por comas)</span>
+              <input type="text" name="extra_options" placeholder="Hamburguesa, Pizza" />
+            </label>
+            <label>
+              <span>Opciones (valenciano, separadas por comas)</span>
+              <input type="text" name="extra_options_val" placeholder="Hamburguesa, Pizza" />
+            </label>
             <label id="admin-extra-label-val">
               <span>Etiqueta extra (valenciano)</span>
               <input type="text" name="extra_label_val" />
+            </label>
+            <label>
+              <span>PIN del evento</span>
+              <input type="text" name="event_pin" placeholder="Opcional" />
             </label>
             <label>
               <span>L&iacute;mite de plazas</span>
@@ -329,12 +369,6 @@
     <footer class="site-footer">
       <p>&copy; <span id="year"></span> Falla Castielfabib - Marqu&eacute;s de San Ju&aacute;n</p>
       <a href="#/admin" class="admin-link">Admin</a>
-      <div class="demo-toggle" id="demo-toggle" hidden>
-        <label>
-          <input type="checkbox" id="demo-toggle-input" />
-          Usar modo demo
-        </label>
-      </div>
     </footer>
 
     <script src="config.js"></script>

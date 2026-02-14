@@ -156,16 +156,6 @@ body {
   padding: 0 clamp(20px, 6vw, 80px) 80px;
 }
 
-.demo-banner {
-  background: rgba(241, 201, 106, 0.22);
-  border: 1px dashed rgba(241, 201, 106, 0.8);
-  color: #7a4b00;
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  margin-bottom: 20px;
-  font-weight: 600;
-}
-
 .loading-overlay {
   position: fixed;
   inset: 0;
@@ -471,11 +461,20 @@ button {
   font-weight: 600;
 }
 
-.signup-form input {
+.signup-form input,
+.signup-form textarea,
+.signup-form select {
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid rgba(16, 22, 35, 0.15);
   font-size: 1rem;
+  font-family: inherit;
+  background: #fff;
+}
+
+.signup-form textarea {
+  resize: vertical;
+  min-height: 82px;
 }
 
 .signup-actions {
@@ -483,6 +482,56 @@ button {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 4px;
+}
+
+.signup-count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(36, 88, 178, 0.12);
+  border-radius: 12px;
+  background: rgba(36, 88, 178, 0.04);
+}
+
+.signup-count-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.signup-rows {
+  display: grid;
+  gap: 10px;
+}
+
+.signup-row-item {
+  border: 1px solid rgba(16, 22, 35, 0.12);
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.signup-row-item.has-error {
+  border-color: rgba(227, 82, 82, 0.7);
+  background: rgba(227, 82, 82, 0.04);
+}
+
+.signup-row-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+@media (min-width: 700px) {
+  .signup-row-grid.extended {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
+.signup-row-error {
+  margin-top: 8px;
 }
 
 .form-hint {
@@ -658,15 +707,6 @@ button.ghost.mini {
   font-weight: 600;
 }
 
-.demo-toggle {
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-.demo-toggle input {
-  margin-right: 6px;
-}
-
 .admin-section {
   margin-top: 64px;
 }
@@ -676,21 +716,23 @@ button.ghost.mini {
   gap: 12px;
 }
 
-.admin-close {
-  display: grid;
+.admin-tabs {
+  display: flex;
   gap: 10px;
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  background: rgba(241, 201, 106, 0.15);
-  border: 1px dashed rgba(241, 201, 106, 0.6);
-  margin-bottom: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.admin-tabs .ghost.active {
+  background: var(--blue-500);
+  color: #fff;
+  border-color: transparent;
 }
 
 .admin-event {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
   padding: 12px 16px;
   border-radius: var(--radius-md);
   border: 1px solid rgba(36, 88, 178, 0.15);
@@ -701,8 +743,25 @@ button.ghost.mini {
   margin: 0;
 }
 
+.admin-event-content {
+  min-width: 0;
+}
+
+.admin-event-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .events-sentinel {
   height: 1px;
+}
+
+.events-route-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
 }
 
 @keyframes fadeUp {
