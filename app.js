@@ -79,10 +79,13 @@ const elements = {
   signupSubmit: document.getElementById("signup-submit"),
   signupConfirm: document.getElementById("signup-confirm"),
   signupHint: document.getElementById("signup-hint"),
-  signupSuccess: document.getElementById("signup-success"),
   saveSignupAccess: document.getElementById("save-signup-access"),
   saveSignupHint: document.getElementById("save-signup-hint"),
   saveCalendarEvent: document.getElementById("save-calendar-event"),
+  signupCompleteModal: document.getElementById("signup-complete-modal"),
+  signupCompleteBackdrop: document.getElementById("signup-complete-backdrop"),
+  signupCompleteClose: document.getElementById("signup-complete-close"),
+  signupCompleteBody: document.getElementById("signup-complete-body"),
   tokenForm: document.getElementById("token-form"),
   tokenEditor: document.getElementById("token-editor"),
   editForm: document.getElementById("edit-form"),
@@ -112,6 +115,7 @@ const elements = {
   dayModalClose: document.getElementById("day-modal-close"),
   dayModalTitle: document.getElementById("day-modal-title"),
   dayModalList: document.getElementById("day-modal-list"),
+  headerLogoBtn: document.getElementById("header-logo-btn"),
   headerHomeBtn: document.getElementById("header-home-btn"),
   headerCalendarBtn: document.getElementById("header-calendar-btn"),
   ctaUpcoming: document.getElementById("cta-upcoming"),
@@ -379,6 +383,47 @@ function buildGoogleCalendarUrl(event) {
     dates: `${start}/${end}`,
   });
   return `https://calendar.google.com/calendar/render?${query.toString()}`;
+}
+
+function hasCalendarData(event) {
+  if (!event) return false;
+  const title = getEventText(event, "title");
+  return Boolean(title && event.date && event.time && getEventText(event, "place"));
+}
+
+function openSignupCompleteModal() {
+  if (!elements.signupCompleteModal || !state.signupSuccess) return;
+  elements.signupCompleteModal.hidden = false;
+  document.body.classList.add("modal-open");
+
+  if (elements.signupCompleteBody) {
+    elements.signupCompleteBody.textContent = t("signup.successBody");
+  }
+
+  if (elements.saveCalendarEvent) {
+    elements.saveCalendarEvent.hidden = !hasCalendarData(state.selectedEvent);
+  }
+
+  if (elements.saveSignupHint) {
+    elements.saveSignupHint.textContent = "";
+  }
+}
+
+async function closeSignupCompleteModal({ refresh = true } = {}) {
+  if (!elements.signupCompleteModal) return;
+  const eventId = state.signupSuccess && state.signupSuccess.eventId;
+  elements.signupCompleteModal.hidden = true;
+  document.body.classList.remove("modal-open");
+  if (elements.signupCompleteClose) {
+    elements.signupCompleteClose.blur();
+  }
+  state.signupSuccess = null;
+  if (elements.signupPanel) {
+    elements.signupPanel.hidden = false;
+  }
+  if (refresh && eventId) {
+    await refreshEvent(eventId);
+  }
 }
 
 function saveAccessState() {
@@ -808,7 +853,6 @@ function renderEventDetails(event) {
     event.model === "extended"
       ? t("model.extended").replace("{label}", extraLabel || t("signup.name"))
       : t("model.basic");
-  const keepSuccess = state.signupSuccess && state.signupSuccess.eventId === event.id;
 
   elements.eventName.textContent = getEventText(event, "title");
   elements.eventDesc.textContent = getEventText(event, "description");
@@ -831,13 +875,12 @@ function renderEventDetails(event) {
   elements.signupForm.reset();
   renderSignupRows(event, buildDefaultSignupEntries(state.signupUi.count || 1));
   clearSignupRowErrors();
-  if (elements.signupPanel) elements.signupPanel.hidden = !!keepSuccess;
-  elements.signupSuccess.hidden = !keepSuccess;
+  if (elements.signupPanel) elements.signupPanel.hidden = false;
   elements.signupConfirm.hidden = true;
-  elements.signupHint.textContent = keepSuccess ? t("form.ok") : "";
+  elements.signupHint.textContent = "";
   elements.signupHint.classList.remove("error");
   state.pendingDuplicate = null;
-  if (!keepSuccess && elements.saveSignupHint) {
+  if (elements.saveSignupHint) {
     elements.saveSignupHint.textContent = "";
   }
 
@@ -873,9 +916,6 @@ function renderEventDetailRoute(eventId) {
     navigate("/eventos", { replace: true });
     return;
   }
-  if (!state.signupSuccess || state.signupSuccess.eventId !== eventId) {
-    state.signupSuccess = null;
-  }
   renderEventDetails(event);
   if (!event.attendees) {
     loadEventDetails(eventId);
@@ -884,6 +924,7 @@ function renderEventDetailRoute(eventId) {
 
 async function adminList() {
   if (!state.admin.authenticated) return;
+  setGlobalLoading(true);
   try {
     const data = await jsonp("admin_list", { secret: state.admin.secret });
     if (!data.ok) throw new Error(data.error || "Admin error");
@@ -892,6 +933,8 @@ async function adminList() {
   } catch (err) {
     console.error(err);
     elements.adminLoginHint.textContent = "No se pudo cargar el panel.";
+  } finally {
+    setGlobalLoading(false);
   }
 }
 
@@ -1448,13 +1491,12 @@ async function submitSignup({ allowDuplicate = false } = {}) {
       elements.signupHint.classList.remove("error");
     } else {
       if (elements.signupPanel) elements.signupPanel.hidden = true;
-      elements.signupSuccess.hidden = false;
       elements.signupConfirm.hidden = true;
       const tokenUrl = `${window.location.origin}${window.location.pathname}#/inscripcion/${result.token}`;
-      elements.signupHint.textContent = t("form.ok");
+      elements.signupHint.textContent = "";
       elements.signupHint.classList.remove("error");
       state.signupSuccess = { eventId: result.event_id, tokenUrl };
-      await refreshEvent(result.event_id);
+      openSignupCompleteModal();
     }
   } catch (err) {
     console.error(err);
@@ -1594,6 +1636,9 @@ function hideAllRouteSections() {
 function renderRoute(route) {
   state.route = route;
   closeDayModal();
+  if (elements.signupCompleteModal && !elements.signupCompleteModal.hidden) {
+    closeSignupCompleteModal({ refresh: false });
+  }
   cleanupEventsRouteObserver();
   hideAllRouteSections();
 
@@ -1679,6 +1724,10 @@ function resolveRoute() {
 
 function setupEvents() {
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  if (elements.headerLogoBtn) {
+    elements.headerLogoBtn.onclick = () => navigate("/");
+  }
 
   if (elements.headerHomeBtn) {
     elements.headerHomeBtn.onclick = () => navigate("/");
@@ -1782,29 +1831,40 @@ function setupEvents() {
   if (elements.saveSignupAccess) {
     elements.saveSignupAccess.onclick = async () => {
       const tokenUrl = state.signupSuccess && state.signupSuccess.tokenUrl;
+      const eventTitle = state.selectedEvent ? getEventText(state.selectedEvent, "title") : "";
       if (!tokenUrl) return;
-      const text = `${t("signup.successTitle")}: ${tokenUrl}`;
+      const text = `${eventTitle || t("signup.successTitle")}: ${tokenUrl}`;
       if (navigator.share) {
         try {
-          await navigator.share({ title: t("signup.successTitle"), text, url: tokenUrl });
+          await navigator.share({ title: eventTitle || t("signup.successTitle"), text, url: tokenUrl });
           if (elements.saveSignupHint) elements.saveSignupHint.textContent = t("signup.savedAccess");
           return;
         } catch (_err) {
           // fall back to copy
         }
       }
-      await navigator.clipboard.writeText(tokenUrl);
-      if (elements.saveSignupHint) {
-        elements.saveSignupHint.textContent = t("signup.savedAccess");
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        if (elements.saveSignupHint) {
+          elements.saveSignupHint.textContent = t("signup.savedAccess");
+        }
       }
     };
   }
 
   if (elements.saveCalendarEvent) {
     elements.saveCalendarEvent.onclick = () => {
-      if (!state.selectedEvent) return;
+      if (!state.selectedEvent || !hasCalendarData(state.selectedEvent)) return;
       window.open(buildGoogleCalendarUrl(state.selectedEvent), "_blank", "noopener");
     };
+  }
+
+  if (elements.signupCompleteBackdrop) {
+    elements.signupCompleteBackdrop.onclick = () => closeSignupCompleteModal();
+  }
+
+  if (elements.signupCompleteClose) {
+    elements.signupCompleteClose.onclick = () => closeSignupCompleteModal();
   }
 
   elements.tokenForm.addEventListener("submit", (event) => {
@@ -1882,6 +1942,12 @@ function setupEvents() {
 
   window.addEventListener("hashchange", () => {
     resolveRoute();
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && elements.signupCompleteModal && !elements.signupCompleteModal.hidden) {
+      closeSignupCompleteModal();
+    }
   });
 }
 

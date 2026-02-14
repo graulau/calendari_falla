@@ -19,15 +19,14 @@ Solucion ligera para publicar eventos, ver la lista de apuntados y mantener un c
 4. Who has access: `Anyone`.
 5. Copia la URL que te da el deployment.
 
-## 3. Configurar la web
-1. Abre `config.js` y pega la URL en `API_URL`.
-2. Despliega la web en Netlify.
-
-## Demo (sin Google Sheets)
-Para mostrar la web sin backend:
-- Deja `API_URL` sin configurar.
-- Mantiene `DEMO: true` en `config.js`.
-- Los datos se cargan desde `DEMO_EVENTS`.
+## 3. Configurar la web (sin exponer secretos)
+1. Mantén `config.js` con placeholders (apto para repo público).
+2. Crea `config.local.js` con valores reales (archivo ignorado por git):
+   - `API_URL`
+   - `ADMIN_EMAIL`
+   - `ADMIN_SECRET`
+   - `APP_PASSWORD`
+3. Despliega la web en Netlify.
 
 ## 4. Gestionar eventos
 La hoja `events` contiene estos campos (una fila = un evento):
@@ -60,7 +59,7 @@ Las inscripciones van a la hoja `signups` automaticamente.
 - Edicion por token: la web entrega un enlace privado tras apuntarse.
 
 ## Panel admin (misma web)
-Accede a `/#/admin` y usa la clave definida en `config.js` y `apps_script/Code.gs` (`ADMIN_SECRET`).
+Accede a `/#/admin` y usa la clave definida en tu `config.local.js` y `apps_script/Code.gs` (`ADMIN_SECRET`).
 Desde el panel puedes crear, editar y borrar eventos.
 El ID se genera automaticamente al guardar un evento nuevo.
 

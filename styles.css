@@ -32,6 +32,10 @@ body {
   overflow-x: hidden;
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
 .bg-orb {
   position: fixed;
   border-radius: 50%;
@@ -69,6 +73,23 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.logo-btn {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.logo-btn:focus,
+.logo-btn:focus-visible,
+.logo-btn:active {
+  outline: none;
+  box-shadow: none;
 }
 
 .brand-logo {
@@ -629,6 +650,27 @@ button.ghost.mini {
   animation: fadeUp 0.25s ease-out;
 }
 
+.signup-complete-panel {
+  border-radius: 20px;
+  width: min(520px, 92vw);
+  padding: 22px;
+  margin-bottom: 24px;
+}
+
+.signup-complete-panel h4 {
+  margin: 0 0 8px;
+}
+
+.signup-complete-panel p {
+  margin: 0;
+}
+
+.signup-complete-footer {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -743,6 +785,12 @@ button.ghost.mini {
   margin: 0;
 }
 
+.admin-login-pill {
+  display: inline-flex;
+  align-items: center;
+  letter-spacing: 0.08em;
+}
+
 .admin-event-content {
   min-width: 0;
 }
@@ -809,6 +857,19 @@ button.ghost.mini {
   .header-actions {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .signup-complete-panel {
+    margin-bottom: 10px;
+  }
+
+  .signup-complete-panel .success-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .signup-complete-panel .success-actions button {
+    width: 100%;
   }
 }
 

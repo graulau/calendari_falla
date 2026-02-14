@@ -601,10 +601,20 @@ function adminEventSignups_(params) {
     }));
 
   const totals = {};
+  const totalsMeta = {};
   if ((event.model || "basic") === "extended") {
+    const optionResolver = createExtraOptionResolver_(event);
     signups.forEach((row) => {
-      const key = row.extra || "Sin especificar";
-      totals[key] = (totals[key] || 0) + 1;
+      const resolved = optionResolver(row.extra) || "Sin especificar";
+      const groupKey = canonicalExtraGroupKey_(resolved);
+      if (!totalsMeta[groupKey]) {
+        totalsMeta[groupKey] = { label: resolved, count: 0 };
+      }
+      totalsMeta[groupKey].count += 1;
+    });
+    Object.keys(totalsMeta).forEach((groupKey) => {
+      const item = totalsMeta[groupKey];
+      totals[item.label] = item.count;
     });
   }
 
@@ -625,6 +635,57 @@ function adminEventSignups_(params) {
     signups,
     extra_totals: totals,
   };
+}
+
+function parseOptionList_(value) {
+  if (!value) return [];
+  return value
+    .toString()
+    .split(/[|,]+/)
+    .map((item) => normalizeSpaces_(item))
+    .filter(Boolean);
+}
+
+function normalizeOptionKey_(value) {
+  return normalizeSpaces_(value).toLowerCase();
+}
+
+function createExtraOptionResolver_(event) {
+  const es = parseOptionList_(event.extra_options);
+  const val = parseOptionList_(event.extra_options_val);
+  const lookup = {};
+
+  es.forEach((label, index) => {
+    const canonical = label;
+    lookup[normalizeOptionKey_(label)] = canonical;
+    if (val[index]) lookup[normalizeOptionKey_(val[index])] = canonical;
+  });
+  val.forEach((label, index) => {
+    if (!lookup[normalizeOptionKey_(label)]) {
+      const fallback = es[index] || label;
+      lookup[normalizeOptionKey_(label)] = fallback;
+    }
+  });
+
+  return function resolve(extraValue) {
+    const key = normalizeOptionKey_(extraValue);
+    if (!key) return "";
+    return lookup[key] || normalizeSpaces_(extraValue);
+  };
+}
+
+function canonicalExtraGroupKey_(value) {
+  const normalized = normalizeSpaces_(value);
+  if (!normalized) return "__empty__";
+
+  return normalized
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\banys?\b/g, "anos")
+    .replace(/\bano\b/g, "anos")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 
 function adminDuplicate_(params) {

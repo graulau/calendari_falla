@@ -6,6 +6,7 @@ test("admin panel includes active/closed tabs", () => {
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
   assert.equal(html.includes('id="admin-tab-active"'), true);
   assert.equal(html.includes('id="admin-tab-closed"'), true);
+  assert.equal(html.includes("admin-login-pill"), true);
 });
 
 test("frontend includes admin duplicate and list actions", () => {
@@ -14,6 +15,8 @@ test("frontend includes admin duplicate and list actions", () => {
   assert.equal(app.includes("adminDuplicate(event.id)"), true);
   assert.equal(app.includes('data-action="duplicate"'), true);
   assert.equal(app.includes("No hay nadie apuntado."), true);
+  assert.equal(app.includes("setGlobalLoading(true);"), true);
+  assert.equal(app.includes("setGlobalLoading(false);"), true);
 });
 
 test("apps script exposes admin signups and duplicate actions", () => {
