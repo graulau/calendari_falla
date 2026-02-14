@@ -12,8 +12,10 @@ test("admin panel includes active/closed tabs", () => {
 test("frontend includes admin duplicate and list actions", () => {
   const app = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8");
   assert.equal(app.includes("openAdminListView(event.id)"), true);
+  assert.equal(app.includes("adminCopyEventLink(event.id"), true);
   assert.equal(app.includes("adminDuplicate(event.id)"), true);
   assert.equal(app.includes('data-action="duplicate"'), true);
+  assert.equal(app.includes('data-action="link"'), true);
   assert.equal(app.includes("No hay nadie apuntado."), true);
   assert.equal(app.includes("setGlobalLoading(true);"), true);
   assert.equal(app.includes("setGlobalLoading(false);"), true);

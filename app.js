@@ -967,6 +967,7 @@ function renderAdminEvents() {
       <div class="admin-event-actions">
         <button class="ghost" data-action="edit">Editar</button>
         <button class="ghost" data-action="list">Lista</button>
+        <button class="ghost" data-action="link">Enlace</button>
         ${
           state.admin.activeTab === "active"
             ? `<button class="danger" data-action="close">Cerrar</button>`
@@ -976,6 +977,7 @@ function renderAdminEvents() {
     `;
     row.querySelector("[data-action='edit']").onclick = () => openAdminEditor(event.id);
     row.querySelector("[data-action='list']").onclick = () => openAdminListView(event.id);
+    row.querySelector("[data-action='link']").onclick = (clickEvent) => adminCopyEventLink(event.id, clickEvent.currentTarget);
     if (state.admin.activeTab === "active") {
       row.querySelector("[data-action='close']").onclick = () => adminClose(event.id);
     } else {
@@ -983,6 +985,54 @@ function renderAdminEvents() {
     }
     elements.adminEvents.appendChild(row);
   });
+}
+
+async function adminCopyEventLink(eventId, button) {
+  const eventUrl = `${window.location.origin}${window.location.pathname}#/eventos/${encodeURIComponent(eventId)}`;
+  const event = state.admin.events.find((item) => item.id === eventId);
+  const eventTitle = (event && (event.title || event.title_val)) || "Evento";
+  const shareText = `${eventTitle}: ${eventUrl}`;
+  try {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: eventTitle,
+          text: shareText,
+          url: eventUrl,
+        });
+        if (button) {
+          const originalText = button.textContent;
+          button.textContent = "Compartido";
+          button.disabled = true;
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+          }, 1200);
+        }
+        return;
+      } catch (_err) {
+        // fall back to copy
+      }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(eventUrl);
+    } else {
+      window.prompt("Copia este enlace:", eventUrl);
+      return;
+    }
+    if (button) {
+      const originalText = button.textContent;
+      button.textContent = "Copiado";
+      button.disabled = true;
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.disabled = false;
+      }, 1200);
+    }
+  } catch (err) {
+    console.error(err);
+    window.prompt("Copia este enlace:", eventUrl);
+  }
 }
 
 function escapeHtml(value) {
