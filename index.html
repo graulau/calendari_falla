@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calendari de la Falla Castielfabib - Marqu&eacute;s de San Ju&aacute;n</title>
+    <meta name="description" content="Ap&uacute;ntate a las actividades de la Falla Castielfabib - Marqu&eacute;s de San Ju&aacute;n." />
+    <link rel="icon" href="assets/favicon.png" type="image/png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+    <div class="loading-overlay" id="loading-overlay" hidden>
+      <div class="loading-card">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <p data-i18n="loading.main">Cargando eventos...</p>
+      </div>
+    </div>
+
+    <header class="site-header">
+      <div class="brand">
+        <img
+          src="assets/logo.png"
+          alt="Falla Castielfabib - Marqu&eacute;s de San Ju&aacute;n"
+          class="brand-logo"
+          onerror="this.onerror=null;this.src='assets/logo.svg';"
+        />
+        <div>
+          <p class="brand-eyebrow" data-i18n="brand.eyebrow">Falla de Val&egrave;ncia</p>
+          <h1 class="brand-title" data-i18n="brand.title">Castielfabib - Marqu&eacute;s de San Ju&aacute;n</h1>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="home-btn" id="header-home-btn" type="button" aria-label="Inicio" title="Inicio">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path
+              d="M12 3L3 10.2V21h6.4v-6.2h5.2V21H21V10.2L12 3z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+        <div class="lang-toggle compact" role="group" aria-label="Idioma">
+          <button class="lang-btn" data-lang="es">CAS</button>
+          <button class="lang-btn" data-lang="val">VAL</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="demo-banner" id="demo-banner" hidden>
+        <p data-i18n="demo.banner">
+          Estas viendo una demo. Las inscripciones no se guardan y los datos son de ejemplo.
+        </p>
+      </section>
+      <section class="hero">
+        <div class="hero-actions only">
+          <button class="primary" id="cta-upcoming" data-i18n="hero.cta">Veure pr&ograve;xims actes</button>
+          <button class="ghost" id="cta-calendar" data-i18n="hero.ctaCalendar">Obrir calendari</button>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span class="pill" data-i18n="hero.pill">Próximos eventos</span>
+          </div>
+          <div id="hero-list" class="hero-list"></div>
+        </div>
+      </section>
+
+      <section class="section" id="upcoming">
+        <div class="section-header">
+          <h3 data-i18n="upcoming.title">Pr&ograve;xims actes</h3>
+        </div>
+        <div id="upcoming-list" class="card-grid"></div>
+      </section>
+
+      <section class="section" id="events-route" hidden>
+        <div class="section-header">
+          <h3 data-i18n="upcoming.title">Pr&ograve;xims actes</h3>
+        </div>
+        <div id="events-route-list" class="card-grid"></div>
+        <div id="events-route-sentinel" class="events-sentinel" hidden></div>
+      </section>
+
+      <section class="section" id="calendar">
+        <div class="section-header">
+          <h3 data-i18n="calendar.title">Calendari complet</h3>
+          <div class="calendar-nav">
+            <button class="ghost" id="prev-month" aria-label="Mes anterior">&larr;</button>
+            <div>
+              <p id="calendar-label"></p>
+              <span data-i18n="calendar.hint">Toca un dia amb color per obrir l'acte.</span>
+            </div>
+            <button class="ghost" id="next-month" aria-label="Mes siguiente">&rarr;</button>
+          </div>
+        </div>
+        <div id="calendar-grid" class="calendar-grid"></div>
+      </section>
+
+      <div class="modal" id="day-modal" hidden>
+        <div class="modal-backdrop" id="day-modal-backdrop"></div>
+        <div class="modal-panel">
+          <div class="modal-header">
+            <h4 id="day-modal-title"></h4>
+            <button class="ghost" id="day-modal-close">Cerrar</button>
+          </div>
+          <div id="day-modal-list" class="modal-list"></div>
+        </div>
+      </div>
+
+      <section class="section" id="event-detail" hidden>
+        <div class="section-header">
+          <h3 data-i18n="event.title">Detall de l'acte</h3>
+          <button class="ghost" id="close-event" data-i18n="event.close">Tancar</button>
+        </div>
+        <div class="event-layout">
+          <div class="event-card">
+            <div class="event-header">
+              <h4 id="event-name"></h4>
+              <span id="event-status" class="status-pill"></span>
+            </div>
+            <p id="event-desc"></p>
+            <div class="event-meta">
+              <div>
+                <span data-i18n="event.when">Quan</span>
+                <p id="event-when"></p>
+              </div>
+              <div>
+                <span data-i18n="event.where">On</span>
+                <p id="event-where"></p>
+              </div>
+              <div id="event-availability" class="availability"></div>
+            </div>
+          </div>
+
+          <div class="event-card">
+            <div class="section-header">
+              <h4 id="attendees-title" data-i18n="attendees.title">Gent apuntada</h4>
+            </div>
+            <div id="attendees-list" class="attendees"></div>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div id="signup-panel">
+            <h4 data-i18n="signup.title">Apunta't</h4>
+            <form id="signup-form" class="signup-form">
+              <label>
+                <span data-i18n="signup.name">Nom i cognoms</span>
+                <input type="text" name="name" required placeholder="Laura Mart&iacute;" />
+              </label>
+              <label id="extra-field" hidden>
+                <span id="extra-label"></span>
+                <input type="text" name="extra" />
+              </label>
+              <div class="model-info" id="model-info"></div>
+              <div class="signup-actions">
+                <button class="primary" type="submit" id="signup-submit" data-i18n="signup.submit">Apuntar-me</button>
+                <button class="ghost" type="button" id="signup-confirm" hidden data-i18n="signup.confirm">Inscriure'm igualment</button>
+              </div>
+              <p class="form-hint" id="signup-hint"></p>
+            </form>
+          </div>
+          <div id="signup-success" class="success" hidden>
+            <h5 data-i18n="signup.successTitle">Inscripci&oacute; registrada</h5>
+            <p data-i18n="signup.successBody">Guarda aquest enlla&ccedil; privat per editar o esborrar la teua inscripci&oacute;.</p>
+            <div class="success-actions">
+              <button class="primary" id="save-signup-access" data-i18n="signup.saveAccess">Guardar inscripci&oacute;n</button>
+              <span class="form-hint" id="save-signup-hint"></span>
+            </div>
+            <p class="form-hint" data-i18n="signup.tokenHint">
+              Si el perds, l'administraci&oacute; podr&agrave; ajudar-te des del full de Google.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="token-section">
+        <div class="section-header">
+          <h3 data-i18n="token.title">Editar o esborrar inscripci&oacute;</h3>
+        </div>
+        <div class="event-card">
+          <p data-i18n="token.subtitle">Introdueix el teu enlla&ccedil; privat per modificar la teua inscripci&oacute;.</p>
+          <form id="token-form" class="signup-form">
+            <label>
+              <span data-i18n="token.label">Enlla&ccedil; privat</span>
+              <input type="text" name="token" required placeholder="https://...#/inscripcion/abc123" />
+            </label>
+            <div class="signup-actions">
+              <button class="primary" type="submit" data-i18n="token.load">Carregar</button>
+            </div>
+          </form>
+          <div id="token-editor" class="token-editor" hidden>
+            <h4 data-i18n="token.editTitle">Editar inscripci&oacute;</h4>
+            <form id="edit-form" class="signup-form">
+              <label>
+                <span data-i18n="signup.name">Nom i cognoms</span>
+                <input type="text" name="name" required />
+              </label>
+              <label id="edit-extra-field" hidden>
+                <span id="edit-extra-label"></span>
+                <input type="text" name="extra" />
+              </label>
+              <div class="signup-actions">
+                <button class="primary" type="submit" data-i18n="token.save">Guardar canvis</button>
+                <button class="danger" type="button" id="delete-signup" data-i18n="token.delete">Esborrar inscripci&oacute;</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="legal">
+        <div class="section-header">
+          <h3 data-i18n="legal.title">Av&iacute;s d'&uacute;s</h3>
+        </div>
+        <div class="event-card">
+          <p data-i18n="legal.body">
+            Aquesta aplicaci&oacute; &eacute;s casolana. Utilitzar-la implica acceptar que les dades (nom i cognoms)
+            poden veure's afectades per accessos indeguts. No hi ha garanties de seguretat: la responsabilitat
+            de l'&uacute;s &eacute;s de cada participant.
+          </p>
+        </div>
+      </section>
+
+      <section class="section admin-section" id="admin-section" hidden>
+        <div class="section-header">
+          <h3>Panel admin</h3>
+        </div>
+        <div class="event-card" id="admin-login-card">
+          <p>Acceso solo para administraci&oacute;n.</p>
+          <form id="admin-login-form" class="signup-form">
+            <label>
+              <span>Clave</span>
+              <input type="password" name="secret" required />
+            </label>
+            <div class="signup-actions">
+              <button class="primary" type="submit">Entrar</button>
+            </div>
+            <p class="form-hint" id="admin-login-hint"></p>
+          </form>
+        </div>
+        <div class="event-card" id="admin-panel" hidden>
+          <div class="section-header">
+            <h4>Eventos</h4>
+            <button class="ghost" id="admin-new">Nuevo evento</button>
+          </div>
+          <div class="admin-close">
+            <label>
+              <span>Cerrar evento activo</span>
+              <select id="admin-close-select"></select>
+            </label>
+            <button class="danger" id="admin-close-btn" type="button">Cerrar evento</button>
+          </div>
+          <div id="admin-events" class="admin-events"></div>
+        </div>
+        <div class="event-card" id="admin-editor" hidden>
+          <h4 id="admin-editor-title">Editar evento</h4>
+          <form id="admin-form" class="signup-form">
+            <label>
+              <span>T&iacute;tulo (castellano)</span>
+              <input type="text" name="title" required />
+            </label>
+            <label>
+              <span>T&iacute;tulo (valenciano)</span>
+              <input type="text" name="title_val" />
+            </label>
+            <label>
+              <span>Fecha</span>
+              <input type="date" name="date" required />
+            </label>
+            <label>
+              <span>Hora</span>
+              <input type="time" name="time" />
+            </label>
+            <label>
+              <span>Lugar (castellano)</span>
+              <input type="text" name="place" />
+            </label>
+            <label>
+              <span>Lugar (valenciano)</span>
+              <input type="text" name="place_val" />
+            </label>
+            <label>
+              <span>Descripci&oacute;n (castellano)</span>
+              <input type="text" name="description" />
+            </label>
+            <label>
+              <span>Descripci&oacute;n (valenciano)</span>
+              <input type="text" name="description_val" />
+            </label>
+            <label>
+              <span>Modelo</span>
+              <select name="model" id="admin-model">
+                <option value="basic">B&aacute;sico</option>
+                <option value="extended">Extendido</option>
+              </select>
+            </label>
+            <label id="admin-extra-label">
+              <span>Etiqueta extra (castellano)</span>
+              <input type="text" name="extra_label" />
+            </label>
+            <label id="admin-extra-label-val">
+              <span>Etiqueta extra (valenciano)</span>
+              <input type="text" name="extra_label_val" />
+            </label>
+            <label>
+              <span>L&iacute;mite de plazas</span>
+              <input type="number" name="limit" min="0" />
+            </label>
+            <label>
+              <span>Estado</span>
+              <select name="status">
+                <option value="active">Activo</option>
+                <option value="closed">Cerrado</option>
+                <option value="hidden">Oculto</option>
+              </select>
+            </label>
+            <div class="signup-actions">
+              <button class="primary" type="submit">Guardar</button>
+              <button class="danger" type="button" id="admin-delete">Eliminar</button>
+            </div>
+            <p class="form-hint" id="admin-form-hint"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Falla Castielfabib - Marqu&eacute;s de San Ju&aacute;n</p>
+      <a href="#/admin" class="admin-link">Admin</a>
+      <div class="demo-toggle" id="demo-toggle" hidden>
+        <label>
+          <input type="checkbox" id="demo-toggle-input" />
+          Usar modo demo
+        </label>
+      </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="i18n.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
