@@ -753,6 +753,36 @@ button.ghost.mini {
   margin-top: 64px;
 }
 
+.manual-hero {
+  display: grid;
+  gap: 10px;
+}
+
+.manual-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.manual-grid {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.manual-grid h4 {
+  margin-top: 0;
+}
+
+.manual-grid ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 7px;
+}
+
 .admin-events {
   display: grid;
   gap: 12px;

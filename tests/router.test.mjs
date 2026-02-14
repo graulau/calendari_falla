@@ -30,6 +30,13 @@ test("parseHashRoute parses calendar route", () => {
   });
 });
 
+test("parseHashRoute parses manual route", () => {
+  assert.deepEqual(parseHashRoute("#/manual"), {
+    name: "manual",
+    params: {},
+  });
+});
+
 test("parseHashRoute decodes event id", () => {
   assert.deepEqual(parseHashRoute("#/eventos/cena%202026"), {
     name: "event-detail",

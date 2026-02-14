@@ -56,6 +56,7 @@ const elements = {
   eventsRouteSentinel: document.getElementById("events-route-sentinel"),
   tokenSection: document.getElementById("token-section"),
   legalSection: document.getElementById("legal"),
+  userManualSection: document.getElementById("user-manual"),
   heroList: document.getElementById("hero-list"),
   upcomingList: document.getElementById("upcoming-list"),
   calendarGrid: document.getElementById("calendar-grid"),
@@ -120,6 +121,9 @@ const elements = {
   headerCalendarBtn: document.getElementById("header-calendar-btn"),
   ctaUpcoming: document.getElementById("cta-upcoming"),
   ctaCalendar: document.getElementById("cta-calendar"),
+  footerManualLink: document.getElementById("footer-manual-link"),
+  manualDownloadBtn: document.getElementById("manual-download-btn"),
+  manualDownloadHint: document.getElementById("manual-download-hint"),
 };
 
 function applyI18n() {
@@ -385,6 +389,104 @@ function buildGoogleCalendarUrl(event) {
   return `https://calendar.google.com/calendar/render?${query.toString()}`;
 }
 
+function escapeForHtml(text) {
+  return (text || "")
+    .toString()
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function buildManualDownloadHtml() {
+  const title = t("manual.title");
+  const subtitle = t("manual.subtitle");
+  const sections = [
+    {
+      heading: t("manual.user.title"),
+      items: [t("manual.user.item1"), t("manual.user.item2"), t("manual.user.item3"), t("manual.user.item4")],
+    },
+    {
+      heading: t("manual.limits.title"),
+      items: [t("manual.limits.item1"), t("manual.limits.item2"), t("manual.limits.item3"), t("manual.limits.item4")],
+    },
+    {
+      heading: t("manual.access.title"),
+      items: [t("manual.access.item1"), t("manual.access.item2"), t("manual.access.item3")],
+    },
+    {
+      heading: t("manual.data.title"),
+      items: [t("manual.data.item1"), t("manual.data.item2"), t("manual.data.item3")],
+    },
+    {
+      heading: t("manual.admin.title"),
+      items: [t("manual.admin.item1"), t("manual.admin.item2"), t("manual.admin.item3"), t("manual.admin.item4")],
+    },
+    {
+      heading: t("manual.faq.title"),
+      items: [t("manual.faq.item1"), t("manual.faq.item2"), t("manual.faq.item3")],
+    },
+  ];
+
+  const sectionHtml = sections
+    .map(
+      (section) => `
+        <section class="card">
+          <h2>${escapeForHtml(section.heading)}</h2>
+          <ul>
+            ${section.items.map((item) => `<li>${escapeForHtml(item)}</li>`).join("")}
+          </ul>
+        </section>
+      `
+    )
+    .join("");
+
+  return `<!doctype html>
+<html lang="${state.lang === "val" ? "ca" : "es"}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${escapeForHtml(title)}</title>
+    <style>
+      body { font-family: Inter, Arial, sans-serif; margin: 0; color: #101623; background: #f8fbff; }
+      .page { width: min(980px, 94vw); margin: 18px auto 24px; }
+      .hero { background: #fff; border-radius: 16px; padding: 16px; border: 1px solid rgba(36,88,178,.15); }
+      h1 { margin: 0 0 6px; font-size: 28px; }
+      .sub { margin: 0; color: #56627a; }
+      .grid { margin-top: 12px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); }
+      .card { background: #fff; border-radius: 14px; padding: 12px 14px; border: 1px solid rgba(36,88,178,.12); }
+      h2 { margin: 0 0 8px; font-size: 18px; }
+      ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <h1>${escapeForHtml(title)}</h1>
+        <p class="sub">${escapeForHtml(subtitle)}</p>
+      </header>
+      <div class="grid">${sectionHtml}</div>
+    </main>
+  </body>
+</html>`;
+}
+
+function downloadManualHtml() {
+  const html = buildManualDownloadHtml();
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  const suffix = state.lang === "val" ? "val" : "es";
+  anchor.href = url;
+  anchor.download = `manual-falla-castielfabib-${suffix}.html`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+  if (elements.manualDownloadHint) {
+    elements.manualDownloadHint.textContent = t("manual.downloaded");
+  }
+}
+
 function hasCalendarData(event) {
   if (!event) return false;
   const title = getEventText(event, "title");
@@ -473,7 +575,7 @@ function requiredSecretForRoute(route) {
 }
 
 function shouldProtectRoute(route) {
-  return ["home", "calendar", "events", "event-detail"].includes(route.name);
+  return ["home", "calendar", "events", "event-detail", "manual"].includes(route.name);
 }
 
 function gateRoute(route) {
@@ -1680,6 +1782,7 @@ function hideAllRouteSections() {
   elements.eventDetail.hidden = true;
   elements.tokenSection.hidden = true;
   elements.legalSection.hidden = true;
+  elements.userManualSection.hidden = true;
   elements.adminSection.hidden = true;
 }
 
@@ -1740,6 +1843,11 @@ function renderRoute(route) {
     return;
   }
 
+  if (route.name === "manual") {
+    elements.userManualSection.hidden = false;
+    return;
+  }
+
   navigate("/", { replace: true });
 }
 
@@ -1797,6 +1905,13 @@ function setupEvents() {
 
   if (elements.ctaCalendar) {
     elements.ctaCalendar.onclick = () => navigate("/calendario");
+  }
+
+  if (elements.footerManualLink) {
+    elements.footerManualLink.onclick = (event) => {
+      event.preventDefault();
+      navigate("/manual");
+    };
   }
 
   if (elements.signupCountDec) {
@@ -1907,6 +2022,10 @@ function setupEvents() {
       if (!state.selectedEvent || !hasCalendarData(state.selectedEvent)) return;
       window.open(buildGoogleCalendarUrl(state.selectedEvent), "_blank", "noopener");
     };
+  }
+
+  if (elements.manualDownloadBtn) {
+    elements.manualDownloadBtn.onclick = () => downloadManualHtml();
   }
 
   if (elements.signupCompleteBackdrop) {

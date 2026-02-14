@@ -4,6 +4,7 @@ const ROUTES = [
   { name: "events", pattern: /^\/eventos$/ },
   { name: "event-detail", pattern: /^\/eventos\/([^/]+)$/ },
   { name: "signup-token", pattern: /^\/inscripcion\/([^/]+)$/ },
+  { name: "manual", pattern: /^\/manual$/ },
   { name: "admin", pattern: /^\/admin$/ },
 ];
 

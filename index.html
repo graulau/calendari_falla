@@ -261,6 +261,78 @@
         </div>
       </section>
 
+      <section class="section" id="user-manual" hidden>
+        <div class="section-header">
+          <h3 data-i18n="manual.title">Manual de usuario</h3>
+        </div>
+        <div class="event-card manual-hero">
+          <span class="pill" data-i18n="manual.pill">Guía rápida</span>
+          <h4 data-i18n="manual.subtitle">Todo lo necesario para usar la app</h4>
+          <p class="form-hint" data-i18n="manual.intro">
+            Manual práctico para comisión y administración. Directo, simple y pensado para el día a día.
+          </p>
+          <div class="manual-actions">
+            <button class="primary" id="manual-download-btn" type="button" data-i18n="manual.download">
+              Descargar manual (HTML)
+            </button>
+            <span class="form-hint" id="manual-download-hint"></span>
+          </div>
+        </div>
+        <div class="manual-grid">
+          <article class="event-card">
+            <h4 data-i18n="manual.user.title">Para personas usuarias</h4>
+            <ul>
+              <li data-i18n="manual.user.item1">Apuntarte a actos activos.</li>
+              <li data-i18n="manual.user.item2">Editar o borrar tu inscripción con el enlace privado.</li>
+              <li data-i18n="manual.user.item3">Añadir un acto a Google Calendar cuando tenga fecha, hora y lugar.</li>
+              <li data-i18n="manual.user.item4">Ver el calendario completo y el detalle de cada evento.</li>
+            </ul>
+          </article>
+          <article class="event-card">
+            <h4 data-i18n="manual.limits.title">Límites actuales</h4>
+            <ul>
+              <li data-i18n="manual.limits.item1">Cada inscripción debe incluir nombre y apellido.</li>
+              <li data-i18n="manual.limits.item2">Máximo 5 participantes por envío.</li>
+              <li data-i18n="manual.limits.item3">Si necesitas más, puedes hacer un segundo envío.</li>
+              <li data-i18n="manual.limits.item4">No hay cuentas personales ni login por usuario.</li>
+            </ul>
+          </article>
+          <article class="event-card">
+            <h4 data-i18n="manual.access.title">Acceso y PIN</h4>
+            <ul>
+              <li data-i18n="manual.access.item1">La app usa una clave general compartida por la falla.</li>
+              <li data-i18n="manual.access.item2">Al entrar por enlace directo puede pedirse PIN específico del evento.</li>
+              <li data-i18n="manual.access.item3">Este enfoque reduce complejidad y facilita el uso diario.</li>
+            </ul>
+          </article>
+          <article class="event-card">
+            <h4 data-i18n="manual.data.title">Datos y privacidad</h4>
+            <ul>
+              <li data-i18n="manual.data.item1">Solo se pide nombre y apellidos para gestionar apuntes.</li>
+              <li data-i18n="manual.data.item2">No hay seguridad reforzada implementada por ahora.</li>
+              <li data-i18n="manual.data.item3">No introduzcas datos sensibles en ningún campo.</li>
+            </ul>
+          </article>
+          <article class="event-card">
+            <h4 data-i18n="manual.admin.title">Funciones extra de admin</h4>
+            <ul>
+              <li data-i18n="manual.admin.item1">Crear, editar, cerrar y duplicar eventos.</li>
+              <li data-i18n="manual.admin.item2">Abrir lista de asistentes y compartirla.</li>
+              <li data-i18n="manual.admin.item3">Ver acumulados por opción en eventos extended.</li>
+              <li data-i18n="manual.admin.item4">Compartir enlace directo a cada evento.</li>
+            </ul>
+          </article>
+          <article class="event-card">
+            <h4 data-i18n="manual.faq.title">Preguntas rápidas</h4>
+            <ul>
+              <li data-i18n="manual.faq.item1">Si pierdes el enlace, administración puede ayudarte desde la hoja de control.</li>
+              <li data-i18n="manual.faq.item2">Si un acto no deja apuntarte, revisa estado, límite y fecha.</li>
+              <li data-i18n="manual.faq.item3">Para cambios generales, consulta con administración por WhatsApp.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
       <section class="section admin-section" id="admin-section" hidden>
         <div class="section-header">
           <h3>Panel admin</h3>
@@ -377,6 +449,7 @@
 
     <footer class="site-footer">
       <p>&copy; <span id="year"></span> Falla Castielfabib - Marqu&eacute;s de San Ju&aacute;n</p>
+      <a href="#/manual" class="admin-link" id="footer-manual-link" data-i18n="manual.footerLink">Manual de usuario</a>
       <a href="#/admin" class="admin-link">Admin</a>
     </footer>
 
